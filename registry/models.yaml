@@ -1,0 +1,13 @@
+# === Models ===
+llm_models:
+  text_generator: 
+    name: "gpt-4o-mini"
+    primary_use: "General text generation and summarization"
+
+  reasoning_model:
+    name: "gpt-5-mini"
+    primary_use: "Complex reasoning, multi-step problem solving"
+
+# === Models Mapping ===
+agent_model_mapping:
+  question_rewriter: "reasoning_model"
