@@ -1,3 +1,14 @@
-numpy
-pandas
+# === YAML file handler ===
 PyYAML
+
+# === AI Agents ===
+langchain
+langchain_community
+langchain-openai
+langgraph
+
+# === Schema defining ===
+pydantic
+
+# === ENV ===
+python-dotenv

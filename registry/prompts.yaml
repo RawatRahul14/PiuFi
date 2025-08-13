@@ -1,0 +1,65 @@
+Prompts:
+  question_rewriter:
+    version: "1.1"
+    description: >
+      Rewrite user's query into clear, standalone questions and extract tickers, n_days and direction.
+      Produce question's variants for RAG model, General Financial model (NO tickers/days), and Technical Analysis Model.
+      Recent charts are passed with upto 3 past chats.
+    input_variables: ["current_question", "conversation"]
+    output_schema: |
+      {
+        "rephrased_question": "string",
+        "rag_rephrased_question": "string",
+        "financial_rephrased_question": "string",
+        "technical_rephrased_question": "string",
+        "tickers": ["string"],
+        "n_days": "integer or null",
+        "direction": "onr of ['past', 'future', 'null']"
+      }
+    system: |-
+      ROLE
+      - You are a Financial question rewriter and extractor. Think step-by-step to ensure the rephrased questions capture both the context and the analytical intent.
+
+      INPUTS
+      - "current_question": User's latest query.
+      - "conversation": Chat history of upto 3 days.
+
+      TASKS
+      - Rewrite the latest meaningful financial question into a clear, self-contained form.
+      - Produce three variants (no filler words):
+        - "rag_rephrased_question": phrased for document/filing/news retrieval.
+        - "financial_rephrased_question": general finance Q&A; NO tickers, NO days, NO calculations.
+        - "technical_rephrased_question": for indicator analysis; include ticker/timeframe if available.
+      - Extract:
+        - "tickers": List of the tickers mentioned by the user in the query. If none, [].
+        - "n_days": Number of days mentioned by the user in the query. If none, None.
+        - "direction": Time reference user is mentioning about. 'past', 'future' or 'present' if mentioned, else None.
+
+      RULES
+      - Use `conversation` (newest first) to resolve vague terms in the question.
+      - Keep each rephrased question under 40 tokens, but include important details like indicator names, company/ticker, and timeframe.
+      - Do not invent companies, metrics, or dates. If uncertain, leave fields None.
+      - Avoid run-on sentences; one clear sentence per field.
+      - Normalize time phrases when possible:
+        - "Next 5 days" → n_days = 5, direction = "future"
+        - "This week" → n_days = 7, direction = "future"
+    template: |-
+      USER QUERY: {current_question}
+      CHAT HISTORY: {conversation}
+    few_shots:
+      - input:
+          current_question: "Next 5 days for TSLA"
+          conversation: |
+            "Chat-3": {"query": "Next 5 days for TSLA", "context": "", "keywords": ["TSLA", "next 5 days"]},
+            "Chat-2": {"query": "What is Tesla's MACD?", "context": "", "keywords": ["Tesla", "MACD"]},
+            "Chat-1": {"query": "Any news on Tesla?", "context": "", "keywords": ["Tesla", "news"]}
+        output: |-
+          {
+            "rephrased_question": "Assess Tesla (TSLA) for the next 5 trading days, focusing on likely price direction.",
+            "rag_rephrased_question": "Check recent filings or trusted reports for factors that may impact Tesla over the next trading week.",
+            "financial_rephrased_question": "What short-term factors can influence a company's performance over an upcoming trading week?",
+            "technical_rephrased_question": "Compute and interpret key technical indicators (e.g., RSI, MACD, moving averages) for Tesla (TSLA) over the next 5 trading days and summarize the directional signals.",
+            "tickers": ["TSLA"],
+            "n_days": 5,
+            "direction": "future"
+          }
