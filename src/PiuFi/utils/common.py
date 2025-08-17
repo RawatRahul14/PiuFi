@@ -18,10 +18,8 @@ def load_prompt(
 # === Rendering the Prompt ===
 def render_prompt(
         prompt_name: str,
-        *,
-        current_question: str,
-        conversation: str,
-        path: Path = Path("registry/prompts.yaml")
+        path: Path = Path("registry/prompts.yaml"),
+        **kwargs
 ):
     # === Loading the full prompt ===
     prompt_def = load_prompt(
@@ -32,11 +30,11 @@ def render_prompt(
     # === Prepare the user prompt by replacing variables ===
     template = prompt_def["template"]
 
+    # === Collect only the variables prompt needs ===
+    var_values = {k: v for k, v in kwargs.items()}
+
     # === Filing the Variables ===
-    filled_prompt = template.format(
-        current_question = current_question,
-        conversation = conversation
-    )
+    filled_prompt = template.format(**var_values)
 
     return {
         "system": prompt_def["system"],

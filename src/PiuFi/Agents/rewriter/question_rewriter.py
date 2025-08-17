@@ -54,6 +54,9 @@ async def question_rewriter_agent(
     if "tickers" not in state or state["tickers"] is None:
         state["tickers"] = []
 
+    # === If the retriever is available or not ===
+    state["is_retriever_available"] = bool(config.get("configurable", {}).get("retriever"))
+
     # === Variables for the Prompts ===
     current_question = state["question"]
 

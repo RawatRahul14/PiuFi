@@ -32,6 +32,9 @@ class ChatEntry(TypedDict):
 class AgentState(TypedDict):
     # === User's query ===
     question: str
+
+    # === Retriever Info ===
+    is_retriever_available: str
     
     # === Information Extracted ===
     n_days: Optional[int]

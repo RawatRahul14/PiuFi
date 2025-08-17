@@ -25,3 +25,23 @@ class RephrasedQuestion(BaseModel):
     direction: Optional[Literal["past", "future", "present"]] = Field(
         description = "Whether the user is asking about future, past or present data."
     )
+
+# === Question Classifier ===
+class QuestionClassifier(BaseModel):
+    models_list: List[Literal[
+        "rag_model",
+        "normal_financial",
+        "indicator_analyst_model",
+        "off_topic"
+    ]] = Field(
+        description = (
+            "List of one or more models to use for answering the question.\n"
+            "- `rag_model`: Use when the question requires extracting information from financial reports, uploaded documents, or specific metrics in filings.\n"
+            "- `normal_financial`: Use for general finance queries not tied to documents. Examples: definitions (ROI, EPS), comparisons, budgeting, investing basics.\n"
+            "- `indicator_analyst_model`: Use for advanced technical analysis involving financial indicators.\n"
+            "- `off_topic`: Use when the question is unrelated to finance or investing (e.g., jokes, greetings, personal queries, travel, food).\n\n"
+            "Rules:\n"
+            "1. At least one model must be selected.\n"
+            "2. If `off_topic` is chosen, it must be the only item in the list."
+        )
+    )

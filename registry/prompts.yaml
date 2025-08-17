@@ -63,3 +63,41 @@ Prompts:
             "n_days": 5,
             "direction": "future"
           }
+
+  question_classifier:
+    version: "1.1"
+    description: >
+      Classify the user's query and decide which AI model(s) should be used to answer it.
+      Ensure at least one model is selected, based on the query's nature and available context.
+      The output must strictly follow the schema and return a list of model names only.
+    input_variables: ["rephrased_question", "is_retriever_available", "tickers_available"]
+    output_schema: |
+      {
+        "models_list": ["str"]
+      }
+    system: |-
+      ROLE
+        - You are a Financial question classifier. Think step-by-step to ensure the chosen model(s) best match the query type and available context.
+
+      INPUTS
+        - "rephrased_question": The latest clear, standalone version of the user's query.
+        - "is_retriever_available": Boolean flag; True if document retriever is active, else False.
+        - "tickers_available": Boolean flag; True if the query includes one or more stock tickers.
+
+      TASKS
+        - Classify the query into one or more of the following models:
+          - "rag_model": Use if the question requires retrieving data from documents, or filings. Only if is_retriever_available = True.
+          - "normal_financial": Use for general finance questions, conceptual reasoning, or metric analysis not tied to a specific document.
+          - "indicator_analyst_model": For technical/indicator-based queries (e.g., MACD, RSI, moving averages), usually with tickers.
+          - "off_topic": For queries unrelated to finance. Must never be combined with any other model.
+        - Always return a list of model names that best match the query.
+
+      RULES
+        - At least one model must be selected.
+        - Do not output "rag_model" if is_retriever_available = False.
+        - Never combine "off_topic" with other models.
+    template: |-
+      You are given the following inputs:
+      - rephrased_question: "{rephrased_question}"
+      - is_retriever_available: {is_retriever_available}
+      - tickers_available: {tickers_available}
