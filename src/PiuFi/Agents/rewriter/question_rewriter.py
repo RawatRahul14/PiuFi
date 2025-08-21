@@ -35,6 +35,14 @@ async def question_rewriter_agent(
     state["financial_rephrased_question"] = None
     state["technical_rephrased_question"] = None
 
+    ## === Control Flows ===
+    state["missing_list"] = []
+    state["is_followup"] = None
+    state["is_missing"] = None
+
+    ## === User's reply for missin values ===
+    state["user_reply"] = None
+
     ## === Model List ===
     state["models_list"] = []
 

@@ -12,3 +12,4 @@ llm_models:
 agent_model_mapping:
   question_rewriter: "text_generator"
   question_classifier: "text_generator"
+  missing_handler: "text_generator"

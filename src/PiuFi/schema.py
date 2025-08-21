@@ -13,7 +13,7 @@ class RephrasedQuestion(BaseModel):
     financial_rephrased_question: str = Field(
         description = "The rewritten question specifically tailored for technical indicator analysis."
     )
-    technical_rephrased_question: str =Field(
+    technical_rephrased_question: str = Field(
         description = "The rewritten question specifically tailored for general financial question answering, NO ticker."
     )
     tickers: List[Optional[str]] = Field(
@@ -45,3 +45,7 @@ class QuestionClassifier(BaseModel):
             "2. If `off_topic` is chosen, it must be the only item in the list."
         )
     )
+
+# === Error Handling Node ===
+class MissingHandler(BaseModel):
+    tickers: List[Optional[str]] = Field(description = "A list of tickers extracted from the user's question.")

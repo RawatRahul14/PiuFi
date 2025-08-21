@@ -29,7 +29,7 @@ Prompts:
       - Produce three variants (no filler words):
         - "rag_rephrased_question": phrased for document/filing/news retrieval.
         - "financial_rephrased_question": general finance Q&A; NO tickers, NO days, NO calculations.
-        - "technical_rephrased_question": for indicator analysis; include ticker/timeframe if available.
+        - "technical_rephrased_question": for indicator analysis; include timeframe if available.
       - Extract:
         - "tickers": List of the tickers mentioned by the user in the query. If none, [].
         - "n_days": Number of days mentioned by the user in the query. If none, None.
@@ -88,7 +88,7 @@ Prompts:
         - Classify the query into one or more of the following models:
           - "rag_model": Use if the question requires retrieving data from documents, or filings. Only if is_retriever_available = True.
           - "normal_financial": Use for general finance questions, conceptual reasoning, or metric analysis not tied to a specific document.
-          - "indicator_analyst_model": For technical/indicator-based queries (e.g., MACD, RSI, moving averages), usually with tickers.
+          - "indicator_analyst_model": For technical/indicator-based queries (e.g., MACD, RSI, moving averages).
           - "off_topic": For queries unrelated to finance. Must never be combined with any other model.
         - Always return a list of model names that best match the query.
 
@@ -101,3 +101,31 @@ Prompts:
       - rephrased_question: "{rephrased_question}"
       - is_retriever_available: {is_retriever_available}
       - tickers_available: {tickers_available}
+
+  missing_handler:
+    version: "1.1"
+    description: >
+      Extract missing financial parameters (tickers) from the user's reply.
+      Only fill values explicitly mentioned. If none are provided.
+    input_variables: ["user_reply"]
+    output_schema: |
+      {
+        "tickers": ["str"]
+      }
+    system: |-
+      ROLE
+        - You are a Financial parameter extractor.  
+        - Your task is to extract missing variables from the user's natural reply.
+
+      INPUTS
+        - "user_reply": The user's answer to a missing-parameters question.
+
+      TASKS
+        - Extract:
+          - "tickers": Stock ticker symbols (normalize company names to tickers if possible).
+
+      RULES
+        - Do not invent values.  
+
+    template: |-
+      User reply: "{user_reply}"

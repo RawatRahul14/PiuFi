@@ -41,6 +41,14 @@ class AgentState(TypedDict):
     direction: Optional[Literal["past", "future", "present"]]
     tickers: List[Optional[str]]
 
+    # === Flow Controls ===
+    missing_list: List
+    is_followup: Optional[bool]
+    is_missing: Optional[bool]
+
+    # === User's reply for missin values ===
+    user_reply: Optional[str]
+
     # === Models Used ===
     models_list: List[str]
 
